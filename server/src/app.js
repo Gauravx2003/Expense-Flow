@@ -13,12 +13,28 @@ import approvalRoutes from "./routes/approvalRoutes.js";
 import approvalFlowRoutes from "./routes/approvalFlowRoutes.js";
 import auditRoutes from "./routes/auditRoutes.js";
 import companyRoutes from "./routes/companyRoutes.js";
+import ocrRoutes from "./routes/ocrRoutes.js";
+import { fileURLToPath } from "url";
+import path from "path";
 
 // Load environment variables
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5001;
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+// Normalize the GOOGLE_APPLICATION_CREDENTIALS path
+if (process.env.GOOGLE_APPLICATION_CREDENTIALS) {
+  process.env.GOOGLE_APPLICATION_CREDENTIALS = path.resolve(
+    process.env.GOOGLE_APPLICATION_CREDENTIALS.replace(/\\\\/g, "\\")
+  );
+  console.log(
+    "Resolved Google credentials path:",
+    process.env.GOOGLE_APPLICATION_CREDENTIALS
+  );
+}
 
 // Middlewares
 app.use(
@@ -47,6 +63,7 @@ app.use("/api/audit", auditRoutes);
 app.use("/api/approval", approvalRoutes);
 app.use("/api/approval-flows", approvalFlowRoutes);
 app.use("/api/companies", companyRoutes);
+app.use("/api/ocr", ocrRoutes);
 
 // Global error handler
 app.use((err, req, res, next) => {
